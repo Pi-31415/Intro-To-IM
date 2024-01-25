@@ -2,8 +2,6 @@
 // ░█▀▀░░█░░░░█▀▀░█░█░█▀▄░░█░░█▀▄░█▀█░░█░░░█░
 // ░▀░░░▀▀▀░░░▀░░░▀▀▀░▀░▀░░▀░░▀░▀░▀░▀░▀▀▀░░▀░
 
-// Just copy and past the following into a single sketch.js file on p5.js website, and enjoy.
-
 let PieceTitle = "THE\n  🎨 𝓐𝓡𝓣𝓘𝓢𝓣𝓘𝓒\n    ⚙️ 𝔼ℕ𝔾𝕀ℕ𝔼𝔼ℝ";
 //Gear Configurations
 let angleGear = 0; // Initial angleGear for rotation in degrees
@@ -43,7 +41,7 @@ let textY = 50; // Y position for the text
 let vignette; //For soft vignette effect
 
 // Pi Digits Particle Configuration
-let piDigits = '3.14159265358979323846264338327950288419716939937510'; // First 50 digits of Pi
+let piDigits = '3.141592'; // First digits of Pi
 let particles = [];
 let currentIndexPiDigit = 0; // To track the current index of piDigits
 let particleInterval = 500; // Time in milliseconds between each particle
