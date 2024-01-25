@@ -2,6 +2,8 @@
 // ░█▀▀░░█░░░░█▀▀░█░█░█▀▄░░█░░█▀▄░█▀█░░█░░░█░
 // ░▀░░░▀▀▀░░░▀░░░▀▀▀░▀░▀░░▀░░▀░▀░▀░▀░▀▀▀░░▀░
 
+// Just copy the whole thing and paste in sketch.js on P5.js online editor, then enjoy the magic.
+
 let PieceTitle = "THE\n  🎨 𝓐𝓡𝓣𝓘𝓢𝓣𝓘𝓒\n    ⚙️ 𝔼ℕ𝔾𝕀ℕ𝔼𝔼ℝ";
 //Gear Configurations
 let angleGear = 0; // Initial angleGear for rotation in degrees
