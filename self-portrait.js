@@ -134,33 +134,33 @@ function draw() {
   //Draw Gear
   // Draw the gear at (x, y)
   drawGear(
-    width / 2 + 120,
-    height / 2 + 60,
+    width / 2 + 120+mouseX*1/20,
+    height / 2 + 60+mouseY*1/20,
     numTeeth,
     toothWidth,
     toothHeight,
     gearRadius
   );
   drawGear(
-    width / 2 + 40,
-    height / 2 - 160,
+    width / 2 + 40+mouseX*1/10,
+    height / 2 - 160+mouseY*1/10,
     numTeeth,
     toothWidth * 0.7,
     toothHeight * 0.7,
     gearRadius * 0.7
   );
   //Draw the Emblem for Pi
-  drawPiEmblem(width / 2 + 50, height / 2 - 10, 0.7);
+  drawPiEmblem(width / 2 + 50+mouseX*1/20, height / 2 - 10+mouseY*1/20, 0.7);
   // Update the rotation angleGear in degrees
   angleGear += 3; // Increment in degrees
   //Draw Cubes
   let baseangleCube = frameCount * 2; // Base angleCube that increments each frame
   // Draw three cubes with different origins and angleCubes
-  drawCube(530, 520, baseangleCube); // Cube 1
-  drawCube(530, 130, baseangleCube + 30); // Cube 2 with a 30-degree phase shift
+  drawCube(530+mouseX*2/10, 520+mouseY*2/10, baseangleCube); // Cube 1
+  drawCube(530+mouseX*1/10, 130-mouseY*1/10, baseangleCube + 30); // Cube 2 with a 30-degree phase shift
   drawPiCharacterSilhouette();
   //Add one more cube at the front to give z-depth
-  drawCube(120, 350, baseangleCube + 120); // Cube 2 with a 30-degree phase shift. Rotation matrix and multiplication is already implemented in drawCube
+  drawCube(120-mouseX*1/10, 350-mouseY*2/10, baseangleCube + 120); // Cube 2 with a 30-degree phase shift. Rotation matrix and multiplication is already implemented in drawCube
 
   //Add the frontal Text
   textSize(40); // Setting the text size
