@@ -36,6 +36,19 @@ let isBackspacing = false;
 let mistakeProbability = 0.05; // Probability of making a mistake
 `;
 
+// Floating Equation Configurations
+// These are the 4 backpropagation equations to form neural networks
+let equations = [];
+let equationText = [
+  "δ^L = ∇_a C ⊙ σ'(z^L)",
+  "δ^l = ((w^(l+1))^T δ^(l+1)) ⊙ σ'(z^l)",
+  "∂C/∂b^l_j = δ^l_j",
+  "∂C/∂w^l_jk = a^(l-1)_k δ^l_j"
+];
+let eqColor;
+let eqAlpha = 50; // semi-transparent
+let eqTextSize = 24;
+
 // Position variables for code background
 let textX = 50; // X position for the text
 let textY = 50; // Y position for the text
@@ -102,6 +115,15 @@ playButton.style('background-color', 'transparent'); // Transparent background
 playButton.style('font-size', '16px'); // Optional: Adjust font size
 playButton.style('padding', '10px 20px'); // Optional: Adjust padding for better aesthetics
 playButton.style('cursor', 'pointer'); // Optional: Change cursor on hover to indicate it's clickable
+
+  
+//   Create Equations
+  eqColor = color(255, 0, 0, eqAlpha); // Red color by default
+
+  // Initialize equations
+  for (let i = 0; i < equationText.length; i++) {
+    equations.push(new Equation(equationText[i], random(width), random(height)));
+  }
 }
 
 function draw() {
@@ -165,6 +187,55 @@ function draw() {
       particles.splice(i, 1);
     }
   }
+  
+//   Add Equations on floating
+   fill(eqColor);
+  textSize(eqTextSize);
+
+  // Update and display each equation
+  for (let eq of equations) {
+    eq.move();
+    eq.display();
+    eq.bounce();
+  }
+}
+
+// Equation Utilities
+
+function Equation(txt, x, y) {
+  this.txt = txt;
+  this.x = x;
+  this.y = y;
+  this.xSpeed = random(-1, 1);
+  this.ySpeed = random(-1, 1);
+
+  this.move = function() {
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+  };
+
+  this.display = function() {
+    text(this.txt, this.x, this.y);
+  };
+
+  this.bounce = function() {
+    if (this.x > width || this.x < 0) {
+      this.xSpeed *= -1;
+    }
+    if (this.y > height || this.y < 0) {
+      this.ySpeed *= -1;
+    }
+  };
+}
+
+// Function to change the color
+function changeColor(r, g, b) {
+  eqColor = color(r, g, b, eqAlpha);
+}
+
+// Function to change the text size
+function changeTextSize(newSize) {
+  eqTextSize = newSize;
 }
 
 // Pi Digit Class
