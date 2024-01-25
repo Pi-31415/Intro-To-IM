@@ -97,7 +97,7 @@ function setup() {
   vignette.updatePixels();
   //Background Music
   osc = new p5.Oscillator('sawtooth'); // First oscillator
-  osc2 = new p5.Oscillator('square'); // Second oscillator, different wave for variation
+  osc2 = new p5.Oscillator('sawtooth'); // Second oscillator, different wave for variation
   osc.start();
   osc2.start();
   osc.amp(0);
@@ -142,8 +142,8 @@ function draw() {
     gearRadius
   );
   drawGear(
-    width / 2 + 40+mouseX*1/10,
-    height / 2 - 160+mouseY*1/10,
+    width / 2 + 30+mouseX*1/10,
+    height / 2 - 200-mouseY*1/10,
     numTeeth,
     toothWidth * 0.7,
     toothHeight * 0.7,
@@ -305,7 +305,7 @@ function playMelody() {
 
 function playMelody2() {
   if (noteIndex2 < melody2.length && isPlaying) {
-    osc2.freq(frequencies[melody2[noteIndex2]]);
+    osc2.freq(frequencies2[melody2[noteIndex2]]);
     osc2.amp(0.5, 0.1); // Same for second oscillator
 
     let noteDuration2 = (60 / tempo) * 1000 * timing2[noteIndex2]; // Duration in ms based on tempo
