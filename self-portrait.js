@@ -18,7 +18,7 @@ let currentIndex = 0;
 let typingSpeed = 5; // Time in milliseconds
 let nextTypeTime = 0;
 let isBackspacing = false;
-let mistakeProbability = 0.05; // Probability of making a mistake
+let mistakeProbability = 0.07; // Probability of making a mistake
 
 // This will make the program print out its own code, making this art piece technically a Quine (https://en.wikipedia.org/wiki/Quine_(computing))
 let code = `let PieceTitle = "THE\\n  🎨 𝓐𝓡𝓣𝓘𝓢𝓣𝓘𝓒\\n    ⚙️ 𝔼ℕ𝔾𝕀ℕ𝔼𝔼ℝ";
