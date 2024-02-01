@@ -1,12 +1,5 @@
-// Finally done
-
-// Audio and colors
-
-// Highly Optimized
-// Highly Optimized
-
 // Constants
-const TRAIL_LENGTH = 45; // Number of positions to store for the trail
+const TRAIL_LENGTH = 45;
 const NUM_GROUPS = 17;
 const SWARM_SIZE = 10;
 const CIRCLE_SPEED = 0.02;
@@ -16,51 +9,87 @@ const ENTITY_MAX_SPEED = 5;
 const ENTITY_MAX_FORCE = 0.2;
 const DESIRED_SEPARATION = 35;
 const MAX_DISTANCE = 45;
-const STABLE_CHAOS_VALUE = 250;//Found by trial and error
-
+const STABLE_CHAOS_VALUE = 250;
 
 // Global variables
-let swarms = [];
-let targets = [];
-let blasts = [];
-let showTarget = true;
-// Global variable to store the current chaos value
-let currentChaosValue = 0;
-
-let circleRadius, circleOrigin;
-
-let mySound; // Global variable for the sound
-let ExplosionSound;
-let fft; // Variable for the FFT object
-let customFont;
-
-
+let gainNode,
+  swarms = [],
+  targets = [],
+  blasts = [],
+  showTarget = true,
+  currentChaosValue = 0;
+let circleRadius,
+  circleOrigin,
+  mySound,
+  explosionSound,
+  fft,
+  customFont,
+  toggleSoundButton;
 
 function preload() {
-  customFont = loadFont('https://intro-to-im.vercel.app/API/earthorbiter.ttf');
-  // Load the sound file
-  mySound = loadSound('https://intro-to-im.vercel.app/API/gunninforyou_cut.mp3');
-  explosionSound = loadSound('https://intro-to-im.vercel.app/API/explosion.mp3');
+  customFont = loadFont("https://intro-to-im.vercel.app/API/earthorbiter.ttf");
+  mySound = loadSound(
+    "https://intro-to-im.vercel.app/API/gunninforyou_cut.mp3"
+  );
+  explosionSound = loadSound(
+    "https://intro-to-im.vercel.app/API/explosion.mp3"
+  );
 }
-
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  circleRadius = min(windowWidth, windowHeight) / 2; // Choose the smaller of windowWidth or windowHeight
+  circleRadius = min(windowWidth, windowHeight) / 2;
   circleOrigin = createVector(windowWidth / 2, windowHeight / 2);
 
   for (let i = 0; i < NUM_GROUPS; i++) {
-    let swarm = Array.from({ length: SWARM_SIZE }, () => new Entity(random(width), random(height), i));
-    swarms.push(swarm);
-
-    let angle = TWO_PI / NUM_GROUPS * i;
-    targets.push(new MovingTarget(circleOrigin, circleRadius, CIRCLE_SPEED, angle));
+    swarms.push(
+      Array.from(
+        { length: SWARM_SIZE },
+        () => new Entity(random(width), random(height), i)
+      )
+    );
+    targets.push(
+      new MovingTarget(
+        circleOrigin,
+        circleRadius,
+        CIRCLE_SPEED,
+        (TWO_PI / NUM_GROUPS) * i
+      )
+    );
   }
-   mySound.loop();
-   fft = new p5.FFT(0.9); // Initialize FFT
-  fft.setInput(mySound); // Set FFT to analyze 'mySound'
+
+  mySound.loop();
+  fft = new p5.FFT(0.9);
+  fft.setInput(mySound);
+  gainNode = new p5.Gain();
+  mySound.disconnect();
+  mySound.connect(gainNode);
+  gainNode.amp(0.1);
+  gainNode.connect();
+  toggleSoundButton = createButton("Music Off")
+    .position(windowWidth - 120, 20)
+    .mousePressed(toggleSound);
+  styleToggleButton();
 }
 
+function styleToggleButton() {
+  const colorRatio = min(currentChaosValue / STABLE_CHAOS_VALUE, 1);
+  const color = `rgb(${colorRatio * 255}, ${(1 - colorRatio) * 255}, 0)`;
+  toggleSoundButton
+    .style("background-color", "transparent")
+    .style("color", color)
+    .style("border", `1px solid ${color}`);
+}
+
+function toggleSound() {
+  if (mySound.isPlaying()) {
+    mySound.pause();
+    toggleSoundButton.html("Music On");
+  } else {
+    mySound.loop();
+    toggleSoundButton.html("Music Off");
+  }
+}
 
 function drawPiEmblem(x, y, scale) {
   const points = [
@@ -87,8 +116,7 @@ function drawPiEmblem(x, y, scale) {
   beginShape();
   noFill();
   strokeWeight(1);
-  
-  
+
   // Calculate the color based on the chaos value
   const colorRatio = min(currentChaosValue / STABLE_CHAOS_VALUE, 1);
   const r = colorRatio * 255;
@@ -96,7 +124,7 @@ function drawPiEmblem(x, y, scale) {
   const b = 0;
   //Only show Pi logo when in ordered, not chaotic mode
   stroke(r, g, b, (1 - colorRatio) * 255);
-  
+
   for (let i = 0; i < points.length; i++) {
     vertex(x + points[i].x * scale, y + points[i].y * scale);
   }
@@ -107,44 +135,45 @@ function calculateChaos() {
   let totalDistance = 0;
   let entityCount = 0;
 
-  swarms.forEach(swarm => {
+  swarms.forEach((swarm) => {
     // Selecting half of the entities randomly for optimization
     for (let i = 0; i < swarm.length; i += 2) {
       let entity = swarm[i];
       let distance = p5.Vector.dist(entity.location, circleOrigin);
-      totalDistance += (distance);
+      totalDistance += distance;
       entityCount++;
     }
   });
 
   // Calculating the average distance
   let averageDistance = entityCount > 0 ? totalDistance / entityCount : 0;
-  if(averageDistance-STABLE_CHAOS_VALUE <=1){
+  if (averageDistance - STABLE_CHAOS_VALUE <= 1) {
     currentChaosValue = 0;
     return 0;
-  }else{
-    currentChaosValue = averageDistance-STABLE_CHAOS_VALUE;
-    return averageDistance-STABLE_CHAOS_VALUE;
+  } else {
+    currentChaosValue = averageDistance - STABLE_CHAOS_VALUE;
+    return averageDistance - STABLE_CHAOS_VALUE;
   }
 }
 function displayChaos(value) {
+  push();
   textAlign(CENTER, CENTER);
-  textSize(16);
+  textSize(18);
   textFont(customFont);
 
   // Set color based on chaos value
   const colorRatio = min(currentChaosValue / STABLE_CHAOS_VALUE, 1);
   fill(colorRatio * 255, (1 - colorRatio) * 255, 0);
 
-  let chaosText = '';
-  if (value < 50) chaosText = 'System Organized';
-  else if (value < 100) chaosText = 'System Moderately Organized';
-  else if (value < STABLE_CHAOS_VALUE) chaosText = 'System Chaotic';
-  else chaosText = 'System Extremely Chaotic';
+  let chaosText = "";
+  if (value < 50) chaosText = "System Organized";
+  else if (value < 100) chaosText = "System Moderately Organized";
+  else if (value < STABLE_CHAOS_VALUE) chaosText = "System Chaotic";
+  else chaosText = "System Extremely Chaotic";
 
-  text(chaosText, windowWidth / 2, windowHeight/2 + 100);
+  text(chaosText, windowWidth / 2, windowHeight / 2 + 100);
+  pop();
 }
-
 
 function calculateVolume(chaosValue) {
   if (chaosValue < 50) {
@@ -152,7 +181,7 @@ function calculateVolume(chaosValue) {
     return 1;
   } else {
     // Exponential decay for chaosValue greater than 50
-    return exp(-0.02 * (chaosValue - 10));
+    return exp(-0.02 * (chaosValue - 2));
   }
 }
 
@@ -160,16 +189,15 @@ function drawVisualizer() {
   let waveform = fft.waveform();
   noFill();
   beginShape();
-  
+
   // Calculate the color based on the chaos value
   const colorRatio = min(currentChaosValue / STABLE_CHAOS_VALUE, 1);
   const r = colorRatio * 255;
   const g = (1 - colorRatio) * 255;
   const b = 0;
-  
-  strokeWeight(1);
-  stroke(r, g, b, (1 - colorRatio) * 255*0.25);
 
+  strokeWeight(1);
+  stroke(r, g, b, (1 - colorRatio) * 255 * 0.15);
 
   for (let i = 0; i < waveform.length; i++) {
     let x = map(i, 0, waveform.length, 0, width);
@@ -178,42 +206,43 @@ function drawVisualizer() {
   }
   endShape();
 }
-
 function draw() {
   background(0);
-  // Calculate and display chaos value
   let chaosValue = calculateChaos();
-   drawVisualizer(); // Call to draw the visualizer
-  //Draw the Emblem for Pi
-  drawPiEmblem(windowWidth / 2-mouseX*1/20-90,windowHeight / 2-mouseY*1/20-100, 1);
-  targets.forEach(target => target.update());
+  drawVisualizer();
+  drawPiEmblem(
+    windowWidth / 2 - (mouseX * 1) / 20 - 90,
+    windowHeight / 2 - (mouseY * 1) / 20 - 100,
+    1
+  );
+
+  targets.forEach((target) => target.update());
   handleBlasts();
-  swarms.forEach(swarm => handleSwarm(swarm));
+  swarms.forEach((swarm) => handleSwarm(swarm));
   if (showTarget) drawLinesBetweenEntities();
   displayChaos(chaosValue);
-  // Adjust the volume based on chaos value
-  // Assuming the chaos value ranges from 0 to STABLE_CHAOS_VALUE
-  // Adjust the volume based on chaos value
-  let myVolume = calculateVolume(chaosValue)/3;
-  mySound.setVolume(myVolume);
-  //Texts
-   // Art Piece Title
+
+  mySound.setVolume(calculateVolume(chaosValue));
+  push();
+  strokeWeight(0);
   textAlign(CENTER, CENTER);
   textSize(30);
   textFont(customFont);
-  fill(255); // White color for the title
+  fill(255);
   text("Against Entropy", windowWidth / 2, 50);
-
-  // Instructions
   textSize(16);
-  fill(200); // Light gray color for the instructions
-  text("Click anywhere to disturb the system", windowWidth / 2, windowHeight/2 + 200);
-
+  fill(200);
+  text(
+    "Click anywhere to disturb the system",
+    windowWidth / 2,
+    windowHeight / 2 + 200
+  );
+  pop();
+  styleToggleButton();
 }
 
-
 function handleBlasts() {
-  blasts = blasts.filter(blast => {
+  blasts = blasts.filter((blast) => {
     blast.update();
     blast.display();
     return blast.lifePoints > 0;
@@ -221,7 +250,7 @@ function handleBlasts() {
 }
 
 function handleSwarm(swarm) {
-  swarm.forEach(entity => {
+  swarm.forEach((entity) => {
     entity.do(swarm);
     entity.display();
   });
@@ -231,14 +260,12 @@ function mouseClicked() {
   blasts.push(new Blast(mouseX, mouseY));
   // Play explosion sound
   explosionSound.play();
-  explosionSound.setVolume(0.5); // Set to desired volume level
+  explosionSound.setVolume(0.08); // Set to desired volume level
 }
 
 function keyPressed() {
-  if (key === 't' || key === 'T') showTarget = !showTarget;
+  if (key === "t" || key === "T") showTarget = !showTarget;
 }
-
-
 
 // Moving target class
 class MovingTarget {
@@ -270,8 +297,6 @@ class MovingTarget {
   }
 }
 
-
-
 // Blast class
 class Blast {
   constructor(x, y) {
@@ -293,22 +318,22 @@ class Blast {
   // Repel entities within the blast radius
   repel() {
     for (let swarm of swarms) {
-    for (let entity of swarm) {
-      let distance = p5.Vector.dist(entity.location, this.location);
-      if (distance <= this.radius * 1.8) {
-        let force = p5.Vector.sub(entity.location, this.location);
-        force.setMag(this.intensity * 20);
-        entity.applyForce(force);
+      for (let entity of swarm) {
+        let distance = p5.Vector.dist(entity.location, this.location);
+        if (distance <= this.radius * 1.8) {
+          let force = p5.Vector.sub(entity.location, this.location);
+          force.setMag(this.intensity * 20);
+          entity.applyForce(force);
+        }
       }
     }
-  }
   }
 
   // Display the blast
   display() {
     push();
     let opacity = map(this.lifePoints, this.maxLifePoints, 0, 200, 0);
-    stroke(255,155,0, opacity);
+    stroke(255, 155, 0, opacity);
     strokeWeight(map(this.lifePoints, this.maxLifePoints, 0, 1, 20));
     noFill();
     ellipse(this.location.x, this.location.y, this.radius * 2);
@@ -319,7 +344,7 @@ class Blast {
 // Entity (swarm member) class
 class Entity {
   constructor(x, y, groupIndex) {
-    this.trail = []; 
+    this.trail = [];
     this.location = createVector(x, y); // Position of the entity
     this.velocity = createVector(); // Movement velocity of the entity
     this.acceleration = createVector(); // Acceleration for applying forces
@@ -357,7 +382,8 @@ class Entity {
     // Check every entity in the swarm
     for (let other of swarm) {
       let d = p5.Vector.dist(this.location, other.location); // Distance from other entity
-      if ((d > 0) && (d < desiredSeparation)) { // If the entity is too close
+      if (d > 0 && d < desiredSeparation) {
+        // If the entity is too close
         let diff = p5.Vector.sub(this.location, other.location); // Calculate vector pointing away
         diff.normalize();
         diff.div(d); // Weight by distance
@@ -395,24 +421,21 @@ class Entity {
 
   // Display the entity
   display() {
-    
-    
-        // Change color based on chaos value
+    // Change color based on chaos value
     const colorRatio = min(currentChaosValue / STABLE_CHAOS_VALUE, 1);
     const r = colorRatio * 255;
-  const g = (1 - colorRatio) * 255;
-  const b = 0;
+    const g = (1 - colorRatio) * 255;
+    const b = 0;
 
     stroke(r, g, b);
-    
+
     //For loop to draw the trails
-    for (let i = this.trail.length - 1; i >= 0; i-=5) {
+    for (let i = this.trail.length - 1; i >= 0; i -= 5) {
       let opacity = map(i, 0, this.trail.length, 0, 255);
       stroke(r, g, b, opacity); // Decreasing opacity
       point(this.trail[i].x, this.trail[i].y);
     }
 
-    
     strokeWeight(2); // Set stroke weight
     point(this.location.x, this.location.y); // Draw the entity as a point
   }
@@ -429,14 +452,19 @@ function drawLinesBetweenEntities() {
     for (let j = 0; j < swarms[i].length; j++) {
       let entityA = swarms[i][j];
       for (let k = i; k < swarms.length; k++) {
-        for (let l = (k === i ? j + 1 : 0); l < swarms[k].length; l++) {
+        for (let l = k === i ? j + 1 : 0; l < swarms[k].length; l++) {
           let entityB = swarms[k][l];
           let distance = p5.Vector.dist(entityA.location, entityB.location);
           if (distance < MAX_DISTANCE) {
             // Use the calculated color with opacity based on distance
             let opacity = map(distance, 0, MAX_DISTANCE, 255, 0);
             stroke(r, g, b, opacity);
-            line(entityA.location.x, entityA.location.y, entityB.location.x, entityB.location.y);
+            line(
+              entityA.location.x,
+              entityA.location.y,
+              entityB.location.x,
+              entityB.location.y
+            );
           }
         }
       }
