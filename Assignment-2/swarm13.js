@@ -1,9 +1,10 @@
-// Audio and colors
+// Audio and colors, with fft, only texts left and fonts
+
 // Highly Optimized
 // Highly Optimized
 
 // Constants
-const TRAIL_LENGTH = 30; // Number of positions to store for the trail
+const TRAIL_LENGTH = 45; // Number of positions to store for the trail
 const NUM_GROUPS = 17;
 const SWARM_SIZE = 10;
 const CIRCLE_SPEED = 0.02;
@@ -27,10 +28,14 @@ let currentChaosValue = 0;
 let circleRadius, circleOrigin;
 
 let mySound; // Global variable for the sound
+let ExplosionSound;
+let fft; // Variable for the FFT object
+
 
 function preload() {
   // Load the sound file
   mySound = loadSound('https://intro-to-im.vercel.app/API/gunninforyou_cut.mp3');
+  explosionSound = loadSound('https://intro-to-im.vercel.app/API/explosion.mp3');
 }
 
 
@@ -47,8 +52,51 @@ function setup() {
     targets.push(new MovingTarget(circleOrigin, circleRadius, CIRCLE_SPEED, angle));
   }
    mySound.loop();
+   fft = new p5.FFT(0.9); // Initialize FFT
+  fft.setInput(mySound); // Set FFT to analyze 'mySound'
 }
 
+
+function drawPiEmblem(x, y, scale) {
+  const points = [
+    { x: 46.3, y: 72.7 },
+    { x: 46.3, y: 46 },
+    { x: 153.1, y: 46.6 },
+    { x: 153.1, y: 72.9 },
+    { x: 125.1, y: 72.9 },
+    { x: 125.3, y: 126.8 },
+    { x: 127.9, y: 126.8 },
+    { x: 127.9, y: 99.6 },
+    { x: 152.9, y: 99.6 },
+    { x: 152.9, y: 153 },
+    { x: 101.3, y: 153.2 },
+    { x: 101.5, y: 72.3 },
+    { x: 98.7, y: 72.1 },
+    { x: 98.7, y: 152.8 },
+    { x: 46.4, y: 152.9 },
+    { x: 46.4, y: 126.3 },
+    { x: 73.1, y: 126.7 },
+    { x: 73.3, y: 72.7 },
+  ];
+
+  beginShape();
+  noFill();
+  strokeWeight(1);
+  
+  
+  // Calculate the color based on the chaos value
+  const colorRatio = min(currentChaosValue / STABLE_CHAOS_VALUE, 1);
+  const r = colorRatio * 255;
+  const g = (1 - colorRatio) * 255;
+  const b = 0;
+  //Only show Pi logo when in ordered, not chaotic mode
+  stroke(r, g, b, (1 - colorRatio) * 255);
+  
+  for (let i = 0; i < points.length; i++) {
+    vertex(x + points[i].x * scale, y + points[i].y * scale);
+  }
+  endShape(CLOSE);
+}
 
 function calculateChaos() {
   let totalDistance = 0;
@@ -92,15 +140,40 @@ function calculateVolume(chaosValue) {
   }
 }
 
+function drawVisualizer() {
+  let waveform = fft.waveform();
+  noFill();
+  beginShape();
+  
+  // Calculate the color based on the chaos value
+  const colorRatio = min(currentChaosValue / STABLE_CHAOS_VALUE, 1);
+  const r = colorRatio * 255;
+  const g = (1 - colorRatio) * 255;
+  const b = 0;
+  
+  strokeWeight(1);
+  stroke(r, g, b, (1 - colorRatio) * 255*0.25);
+
+
+  for (let i = 0; i < waveform.length; i++) {
+    let x = map(i, 0, waveform.length, 0, width);
+    let y = map(waveform[i], -1, 1, 0, height);
+    vertex(x, y);
+  }
+  endShape();
+}
+
 function draw() {
   background(0);
+  // Calculate and display chaos value
+  let chaosValue = calculateChaos();
+   drawVisualizer(); // Call to draw the visualizer
+  //Draw the Emblem for Pi
+  drawPiEmblem(windowWidth / 2-mouseX*1/20-100,windowHeight / 2-mouseY*1/20-100, 1);
   targets.forEach(target => target.update());
   handleBlasts();
   swarms.forEach(swarm => handleSwarm(swarm));
   if (showTarget) drawLinesBetweenEntities();
-
-  // Calculate and display chaos value
-  let chaosValue = calculateChaos();
   displayChaos(chaosValue);
   // Adjust the volume based on chaos value
   // Assuming the chaos value ranges from 0 to STABLE_CHAOS_VALUE
@@ -127,6 +200,9 @@ function handleSwarm(swarm) {
 
 function mouseClicked() {
   blasts.push(new Blast(mouseX, mouseY));
+  // Play explosion sound
+  explosionSound.play();
+  explosionSound.setVolume(0.5); // Set to desired volume level
 }
 
 function keyPressed() {
@@ -201,11 +277,13 @@ class Blast {
 
   // Display the blast
   display() {
+    push();
     let opacity = map(this.lifePoints, this.maxLifePoints, 0, 200, 0);
-    stroke(255, opacity);
+    stroke(255,155,0, opacity);
     strokeWeight(map(this.lifePoints, this.maxLifePoints, 0, 1, 20));
     noFill();
     ellipse(this.location.x, this.location.y, this.radius * 2);
+    pop();
   }
 }
 
@@ -306,7 +384,7 @@ class Entity {
     }
 
     
-    strokeWeight(3); // Set stroke weight
+    strokeWeight(2); // Set stroke weight
     point(this.location.x, this.location.y); // Draw the entity as a point
   }
 }
