@@ -1,5 +1,4 @@
 // Audio and colors
-
 // Highly Optimized
 // Highly Optimized
 
@@ -27,6 +26,14 @@ let currentChaosValue = 0;
 
 let circleRadius, circleOrigin;
 
+let mySound; // Global variable for the sound
+
+function preload() {
+  // Load the sound file
+  mySound = loadSound('https://intro-to-im.vercel.app/API/gunninforyou_cut.mp3');
+}
+
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   circleRadius = min(windowWidth, windowHeight) / 2; // Choose the smaller of windowWidth or windowHeight
@@ -39,6 +46,7 @@ function setup() {
     let angle = TWO_PI / NUM_GROUPS * i;
     targets.push(new MovingTarget(circleOrigin, circleRadius, CIRCLE_SPEED, angle));
   }
+   mySound.loop();
 }
 
 
@@ -74,6 +82,15 @@ function displayChaos(value) {
   text("Chaos: " + value.toFixed(0), 10, windowHeight - 10);
 }
 
+function calculateVolume(chaosValue) {
+  if (chaosValue < 50) {
+    // When chaosValue is less than 50, volume is at maximum
+    return 1;
+  } else {
+    // Exponential decay for chaosValue greater than 50
+    return exp(-0.02 * (chaosValue - 10));
+  }
+}
 
 function draw() {
   background(0);
@@ -85,6 +102,11 @@ function draw() {
   // Calculate and display chaos value
   let chaosValue = calculateChaos();
   displayChaos(chaosValue);
+  // Adjust the volume based on chaos value
+  // Assuming the chaos value ranges from 0 to STABLE_CHAOS_VALUE
+  // Adjust the volume based on chaos value
+  let myVolume = calculateVolume(chaosValue)/3;
+  mySound.setVolume(myVolume);
 }
 
 
