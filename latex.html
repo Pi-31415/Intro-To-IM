@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LaTeX Renderer</title>
+    <!-- Link to KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" crossorigin="anonymous" />
+    <!-- Link to KaTeX JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<!-- Div to display rendered LaTeX -->
+<div id="latex-output"></div>
+
+<script>
+    // Function to get URL parameters
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Function to decode URL component
+    // Function to decode URL component and handle plus signs
+function decodeUrlComponent(component) {
+    if (!component) return '';
+    // Replace %20 with space and %2B with plus sign
+    return decodeURIComponent(component.replace(/%20/g, ' ').replace(/%2B/g, '+'));
+}
+
+
+    window.onload = function() {
+        // Get the LaTeX string from the URL parameter
+        const latexString = decodeUrlComponent(getQueryParam('equation'));
+
+        // Check if the LaTeX string is present
+        if (latexString) {
+            // Render the LaTeX string using KaTeX
+            katex.render(latexString, document.getElementById('latex-output'), {
+                throwOnError: false
+            });
+        } else {
+            // Display an error or message if no LaTeX string is provided
+            document.getElementById('latex-output').innerText = 'No LaTeX equation provided.';
+        }
+    };
+</script>
+
+</body>
+</html>
