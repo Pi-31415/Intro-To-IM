@@ -77,7 +77,7 @@ function setup() {
   gainNode = new p5.Gain();
   mySound.disconnect();
   mySound.connect(gainNode);
-  gainNode.amp(0.1);
+  gainNode.amp(0.15);
   gainNode.connect();
   toggleSoundButton = createButton("Music Off")
     .position(windowWidth - 120, 20)
