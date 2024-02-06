@@ -89,10 +89,8 @@ void main() {
     vec2 uv = vTexCoord;
     uv = 1.0 - uv; // Flip the texture coordinates
 
-    // Apply a very small blur
-    vec3 blur = texture2D(tex0, uv + vec2(0.01, 0.0) * texelSize).xyz + 
-                texture2D(tex0, uv - vec2(0.01, 0.0) * texelSize).xyz;
-    blur *= 0.5;
+    // Start with a fewer number of steps in the Gaussian blur
+    vec3 blur = gaussianBlur(tex0, uv, texelSize * direction);
 
     gl_FragColor = vec4(blur, 1.0);
 }
