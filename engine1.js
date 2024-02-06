@@ -1,5 +1,4 @@
 // Bounding box working
-
 // Global Variables
 let spritesheet, spritedata, bgImage;
 let animation = [];
@@ -78,3 +77,4 @@ class Sprite {
     }
   }
 }
+
