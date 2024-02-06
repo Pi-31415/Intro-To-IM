@@ -66,7 +66,7 @@ vec3 gaussianBlur( sampler2D t, vec2 texUV, vec2 stepSize ){
 	return colOut;                                                                                                                                                   
 } 
 
-
+/*
 void main() {
 
   vec2 uv = vTexCoord;
@@ -77,4 +77,11 @@ void main() {
   vec3 blur = gaussianBlur(tex0, uv, texelSize * direction);
 
   gl_FragColor = vec4(blur, 1.0);
+}*/
+
+// Inside blur.frag
+void main() {
+    // Output a solid color for testing
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red color
 }
+
