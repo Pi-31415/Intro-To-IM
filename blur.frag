@@ -87,13 +87,13 @@ void main() {
 
 void main() {
     vec2 uv = vTexCoord;
-    // Clamp the texture coordinates to ensure they are within the valid range
-    uv = clamp(uv, 0.0, 1.0);
+    uv = 1.0 - uv; // Flip the texture coordinates
 
-    // Simplify the blur logic to just sample the texture at its current coordinate
-    vec3 color = texture2D(tex0, uv).xyz;
+    // Apply a very small blur
+    vec3 blur = texture2D(tex0, uv + vec2(0.01, 0.0) * texelSize).xyz + 
+                texture2D(tex0, uv - vec2(0.01, 0.0) * texelSize).xyz;
+    blur *= 0.5;
 
-    // Output the color
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(blur, 1.0);
 }
 
