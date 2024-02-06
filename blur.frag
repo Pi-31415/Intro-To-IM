@@ -79,9 +79,9 @@ void main() {
   gl_FragColor = vec4(blur, 1.0);
 }*/
 
-// Inside blur.frag
 void main() {
-    // Output a solid color for testing
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red color
+  vec2 uv = vTexCoord;
+  vec3 color = texture2D(tex0, uv).xyz;
+  gl_FragColor = vec4(color, 1.0);
 }
 
