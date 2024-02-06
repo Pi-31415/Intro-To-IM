@@ -12,6 +12,12 @@ uniform vec2 texelSize;
 // which way to blur, vec2(1.0, 0.0) is horizontal, vec2(0.0, 1.0) is vertical
 uniform vec2 direction;
 
+vec3 simpleBlur(sampler2D t, vec2 texUV, vec2 stepSize) {
+    vec3 col = texture2D(t, texUV + stepSize).xyz + texture2D(t, texUV - stepSize).xyz;
+    return col * 0.5; // Averaging the color
+}
+
+
 // gaussian blur filter modified from Filip S. at intel 
 // https://software.intel.com/en-us/blogs/2014/07/15/an-investigation-of-fast-real-time-gpu-based-image-blur-algorithms
 // this function takes three parameters, the texture we want to blur, the uvs, and the texelSize
@@ -80,8 +86,8 @@ void main() {
 }*/
 
 void main() {
-  vec2 uv = vTexCoord;
-  vec3 color = texture2D(tex0, uv).xyz;
-  gl_FragColor = vec4(color, 1.0);
+    vec2 uv = vTexCoord;
+    vec3 blur = simpleBlur(tex0, uv, texelSize * direction);
+    gl_FragColor = vec4(blur, 1.0);
 }
 
