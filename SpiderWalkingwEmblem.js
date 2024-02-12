@@ -1,17 +1,21 @@
 //Spider Walking with gears and pi emblem
 //Spider is walking and draggable
+//Spider is walking and draggable
 class SpiderBody {
   constructor(x, y) {
-    this.position = createVector(x, y);
+     this.position = createVector(x, y);
+    this.baseY = y; // Base y-position to oscillate around
     this.dragging = false;
     this.dragOffset = createVector(0, 0);
+    this.oscillationAmplitude = 30; // Amplitude of the up-and-down movement
+    this.oscillationSpeed = 0.05; // Speed of the up-and-down movement
   }
 
   update() {
-    if (this.dragging) {
-      this.position.x = mouseX + this.dragOffset.x;
-      this.position.y = mouseY + this.dragOffset.y;
-    }
+
+      this.position.x = mouseX-50; 
+      // Apply a sin motion when not dragging
+      this.position.y = mouseY + sin(frameCount * this.oscillationSpeed) * this.oscillationAmplitude;
   }
 
   mousePressed() {
@@ -296,6 +300,11 @@ function drawLeg(leg, targetX, targetY) {
 function mousePressed() {
   spiderBody.mousePressed();
 }
+
+function mouseReleased() {
+  spiderBody.mouseReleased();
+}
+
 
 function mouseReleased() {
   spiderBody.mouseReleased();
