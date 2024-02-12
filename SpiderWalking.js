@@ -1,5 +1,4 @@
 //Spider is walking and draggable
-
 class SpiderBody {
   constructor(x, y) {
     this.position = createVector(x, y);
@@ -103,7 +102,7 @@ class MechanicalLeg {
     for (let i = 0; i < this.numSegments - 1; i++) {
       if (i !== 0) translate(this.segmentLength, 0);
       rotate(this.isRightFacing ? this.angleX : -this.angleX); // Invert rotation if left-facing
-      strokeWeight(10);
+      strokeWeight(16);
       line(0, 0, this.segmentLength, 0);
     }
 
@@ -121,17 +120,19 @@ let rightLeg, leftLeg,rightLeg1, leftLeg1,rightLeg2, leftLeg2, spiderBody;
 let legs = []; // Array to hold the leg instances
 let spiderAnimatedCheckbox;
 let spiderAnimated = true;
+let gaitHorizontalDistance;
 
 function setup() {
  createCanvas(windowWidth, windowHeight);
+  gaitHorizontalDistance = windowWidth/0.6;
   spiderBody = new SpiderBody(width / 2, height / 2+100);
   // Initialize leg instances and add them to the legs array
-  legs.push(new MechanicalLeg(3, 200, true));  // Right-facing leg
-  legs.push(new MechanicalLeg(3, 200, false)); // Left-facing leg
-  legs.push(new MechanicalLeg(4, 170, true));  // Another right-facing leg
-  legs.push(new MechanicalLeg(4, 170, false)); // Another left-facing leg
-  legs.push(new MechanicalLeg(3, 250, true));  // And so on...
-  legs.push(new MechanicalLeg(3, 250, false));
+  legs.push(new MechanicalLeg(4, 180, true));  // Right-facing leg
+  legs.push(new MechanicalLeg(4, 180, false)); // Left-facing leg
+  legs.push(new MechanicalLeg(5, 150, true));  // Another right-facing leg
+  legs.push(new MechanicalLeg(5, 150, false)); // Another left-facing leg
+  legs.push(new MechanicalLeg(4, 200, true));  // And so on...
+  legs.push(new MechanicalLeg(4, 200, false));
   
    // Create a checkbox for spider animation
   spiderAnimatedCheckbox = createCheckbox('Spider Animated', false);
@@ -155,19 +156,19 @@ function updateAndDrawLegs() {
 
   // Define base target positions for each leg
   let baseTargets = [
-    { x: 1300, y: 900 },
-    { x: 1300, y: 900 },
-    { x: 1300, y: 900 },
-    { x: 1300, y: 900 },
-    { x: 1300, y: 900 },
-    { x: 1300, y: 900 },
-    { x: 1300, y: 900 },
-    { x: 1300, y: 900 },
+    { x: gaitHorizontalDistance, y: 900 },
+    { x: gaitHorizontalDistance, y: 900 },
+    { x: gaitHorizontalDistance, y: 900 },
+    { x: gaitHorizontalDistance, y: 900 },
+    { x: gaitHorizontalDistance, y: 900 },
+    { x: gaitHorizontalDistance, y: 900 },
+    { x: gaitHorizontalDistance, y: 900 },
+    { x: gaitHorizontalDistance, y: 900 },
   ];
 
 for (let i = 0; i < legs.length; i++) {
     let leg = legs[i];
-    let angleSpeedMultiplier = 0.4 + i * 0.2;
+    let angleSpeedMultiplier = 0.3 + i * 0.4;
     let angle = time * angleSpeedMultiplier;
 
     // Reverse direction for left-facing legs
@@ -179,7 +180,7 @@ for (let i = 0; i < legs.length; i++) {
     let targetY = baseTargets[i].y;
 
     if (spiderAnimated) {
-      targetX += 3*radius * cos(angle);
+      targetX += 2*radius * cos(angle);
       targetY += 0.5*radius * sin(angle);
     }
 
@@ -193,7 +194,7 @@ function drawLeg(leg, targetX, targetY) {
     push();
     translate(spiderBody.position.x, spiderBody.position.y);
 
-    let rotation = leg.update(targetX, targetY, width, height);
+    let rotation = leg.update(targetX, targetY, gaitHorizontalDistance, height);
     if (rotation) rotate(rotation);
     leg.draw(rotation);
 
@@ -207,3 +208,4 @@ function mousePressed() {
 function mouseReleased() {
     spiderBody.mouseReleased();
 }
+
