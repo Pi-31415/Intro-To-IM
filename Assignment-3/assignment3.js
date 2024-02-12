@@ -1,9 +1,16 @@
+ //                       _   _           _ _ _         
+ //  _ __  _ __ __ _  ___| |_(_) ___ __ _| (_) |_ _   _ 
+ // | '_ \| '__/ _` |/ __| __| |/ __/ _` | | | __| | | |
+ // | |_) | | | (_| | (__| |_| | (_| (_| | | | |_| |_| |
+ // | .__/|_|  \__,_|\___|\__|_|\___\__,_|_|_|\__|\__, |
+ // |_|                                           |___/ 
 //  __        __    _ _             
 //  \ \      / /_ _| | | _____ _ __ 
 //   \ \ /\ / / _` | | |/ / _ \ '__|
 //    \ V  V / (_| | |   <  __/ |   
 //     \_/\_/ \__,_|_|_|\_\___|_|   
-// Pi Ko (pk2269@nyu.edu)                                 
+// Pi Ko (pk2269@nyu.edu)     
+// This is a 6 legged walker mechnical simulation powered by numerical solutions of Inverse Kinematics.
 
 //Spider is walking and draggable
 class SpiderBody {
@@ -428,7 +435,7 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  gaitHorizontalDistance = windowWidth / 0.6;
+  gaitHorizontalDistance = windowWidth / 0.7;
   spiderBody = new SpiderBody(width / 2, height / 2 + 100);
   // Initialize leg instances and add them to the legs array
   legs.push(new MechanicalLeg(4, 180, true)); // Right-facing leg
@@ -525,7 +532,7 @@ function draw() {
   spiderBody.draw();
   drawGrass();
   fill(0);
-  rect(0,height - 90,windowWidth,100);
+  rect(0,height - 125,windowWidth,500);
   //Add Texts
   push();
   strokeWeight(0);
@@ -558,7 +565,7 @@ function drawGrass() {
   fill(0);
   noStroke();
   grass.forEach((blade, index) => {
-    let grassBottomY = height - 90; // Base height of the grass
+    let grassBottomY = height - 125; // Base height of the grass
     triangle(
       blade.x, grassBottomY,
       blade.x + 5, grassBottomY - blade.height,
@@ -604,7 +611,7 @@ function drawLinesBetweenEntities() {
 
 function updateAndDrawLegs() {
   let time = millis() / 300;
-  let radius = 50; // Radius for walking animation
+  let radius = 100; // Radius for walking animation
   // Define base target positions for each leg
   let baseTargets = [
     { x: gaitHorizontalDistance, y: height + 250 },
@@ -619,7 +626,7 @@ function updateAndDrawLegs() {
 
   for (let i = 0; i < legs.length; i++) {
     let leg = legs[i];
-    let angleSpeedMultiplier = 0.3 + i * 0.4;
+    let angleSpeedMultiplier = 0.3 + i * 0.3;
     let angle = time * angleSpeedMultiplier;
 
     // Reverse direction for left-facing legs
@@ -631,8 +638,8 @@ function updateAndDrawLegs() {
     let targetY = baseTargets[i].y;
 
     if (spiderAnimated) {
-      targetX += 2 * radius * cos(angle);
-      targetY += 0.5 * radius * sin(angle);
+      targetX += 1.5 * radius * cos(angle);
+      targetY += 1.5 * radius * sin(angle);
     }
 
     // Draw each leg with the computed target position
