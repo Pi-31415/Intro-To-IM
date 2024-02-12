@@ -1,5 +1,3 @@
-//SpiderIK is done, just not walking yet
-
 class SpiderBody {
   constructor(x, y) {
     this.position = createVector(x, y);
@@ -30,8 +28,8 @@ class SpiderBody {
   draw() {
     push();
     translate(this.position.x, this.position.y);
-    fill(100); // Color of the spider body
-    ellipse(0, 0, 100, 100); // Drawing the spider body
+    fill(0); // Color of the spider body
+    ellipse(0, -20, 180, 80); // Drawing the spider body
     pop();
   }
 }
@@ -103,6 +101,7 @@ class MechanicalLeg {
     for (let i = 0; i < this.numSegments - 1; i++) {
       if (i !== 0) translate(this.segmentLength, 0);
       rotate(this.isRightFacing ? this.angleX : -this.angleX); // Invert rotation if left-facing
+      strokeWeight(10);
       line(0, 0, this.segmentLength, 0);
     }
 
@@ -121,8 +120,8 @@ let rightLeg, leftLeg,rightLeg1, leftLeg1,rightLeg2, leftLeg2, spiderBody;
 function setup() {
   createCanvas(800, 800);
   spiderBody = new SpiderBody(width / 2, height / 2+100);
-  rightLeg = new MechanicalLeg(4, 200, true); // Right-facing leg
-  leftLeg = new MechanicalLeg(4, 200, false); // Left-facing leg
+  rightLeg = new MechanicalLeg(3, 200, true); // Right-facing leg
+  leftLeg = new MechanicalLeg(3, 200, false); // Left-facing leg
   rightLeg1 = new MechanicalLeg(4, 170, true); // Right-facing leg
   leftLeg1 = new MechanicalLeg(4, 170, false); // Left-facing leg
    rightLeg2 = new MechanicalLeg(3, 300, true); // Right-facing leg
