@@ -535,11 +535,11 @@ function draw() {
   fill(0);
   text("Pi's\nPracticality Walker", windowWidth / 2, 50);
   textSize(16);
-  fill(255);
+  fill(255,0,0);
   text(
     "Move the mouse around.\nAnimation is not hard coded, but \"procedurally generated\" \n on the spot using Inverse Kinematics.",
     windowWidth / 2,
-    windowHeight / 2 + 280
+    height-60
   );
   pop();
 }
@@ -605,17 +605,16 @@ function drawLinesBetweenEntities() {
 function updateAndDrawLegs() {
   let time = millis() / 300;
   let radius = 50; // Radius for walking animation
-
   // Define base target positions for each leg
   let baseTargets = [
-    { x: gaitHorizontalDistance, y: 900 },
-    { x: gaitHorizontalDistance, y: 900 },
-    { x: gaitHorizontalDistance, y: 900 },
-    { x: gaitHorizontalDistance, y: 900 },
-    { x: gaitHorizontalDistance, y: 900 },
-    { x: gaitHorizontalDistance, y: 900 },
-    { x: gaitHorizontalDistance, y: 900 },
-    { x: gaitHorizontalDistance, y: 900 },
+    { x: gaitHorizontalDistance, y: height + 250 },
+    { x: gaitHorizontalDistance, y: height + 250 },
+    { x: gaitHorizontalDistance, y: height + 250 },
+    { x: gaitHorizontalDistance, y: height + 250 },
+    { x: gaitHorizontalDistance, y: height + 250 },
+    { x: gaitHorizontalDistance, y: height + 250 },
+    { x: gaitHorizontalDistance, y: height + 250 },
+    { x: gaitHorizontalDistance, y: height + 250 },
   ];
 
   for (let i = 0; i < legs.length; i++) {
