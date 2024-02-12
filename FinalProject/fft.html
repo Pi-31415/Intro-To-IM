@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-time Audio Visualization</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #audioChartContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <button onclick="startAudio()">Start Audio</button>
+    <button onclick="stopAudio()">Stop Audio</button>
+    <div id="audioChartContainer">
+        <canvas id="audioChart"></canvas>
+    </div>
+    <script>
+        let audioContext, analyser, dataArray, source, bufferLength, animationFrameRequest;
+        const MAX_PLOT_POINTS = 300;
+        const MOVING_AVERAGE_POINTS = 5; // Moving average window size
+        const freqHistory = [];
+        let chart;
+        const a1 = 1.0; // Adjust these weights as needed
+        const a2 = 0.5;
+        const MAX_Y_VALUE = 1000; // Adjustable maximum y-axis value
+
+        async function startAudio() {
+            if (!navigator.mediaDevices) {
+                alert('Your browser does not support media devices.');
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioContext = new AudioContext();
+                analyser = audioContext.createAnalyser();
+                source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                analyser.fftSize = 2048;
+                bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+                initializeChart();
+                draw();
+            } catch (err) {
+                alert('Error accessing audio: ' + err);
+            }
+        }
+
+        function stopAudio() {
+            if (audioContext) {
+                audioContext.close();
+            }
+            if (animationFrameRequest) {
+                cancelAnimationFrame(animationFrameRequest);
+            }
+            freqHistory.length = 0;
+            if (chart) {
+                chart.destroy();
+            }
+        }
+
+        function initializeChart() {
+            const ctx = document.getElementById('audioChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: new Array(MAX_PLOT_POINTS).fill(''),
+                    datasets: [{
+                        label: 'Q Value',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        data: new Array(MAX_PLOT_POINTS).fill(0),
+                        fill: false,
+                        tension: 0.4 // Smooths the line
+                    }]
+                },
+                options: {
+                    animation: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: MAX_Y_VALUE // Maximum y-axis value
+                        }
+                    },
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function draw() {
+            animationFrameRequest = requestAnimationFrame(draw);
+            analyser.getByteFrequencyData(dataArray);
+
+            const { dominantFreq, loudness } = analyzeAudioData(dataArray);
+            let qValue = a1 * dominantFreq + a2 * loudness;
+            qValue = Math.min(qValue, MAX_Y_VALUE);
+            freqHistory.push(qValue);
+
+            if (freqHistory.length > MAX_PLOT_POINTS) {
+                freqHistory.shift();
+            }
+
+            const averagedData = applyMovingAverage(freqHistory, MOVING_AVERAGE_POINTS);
+            chart.data.datasets[0].data = averagedData;
+            chart.update();
+        }
+
+        function applyMovingAverage(dataArray, points) {
+            return dataArray.map((_, idx, arr) => {
+                const startIdx = Math.max(0, idx - points + 1);
+                const endIdx = idx + 1;
+                const subset = arr.slice(startIdx, endIdx);
+                return subset.reduce((a, b) => a + b, 0) / subset.length;
+            });
+        }
+
+        function analyzeAudioData(dataArray) {
+            let maxIndex = 0;
+            let maxValue = 0;
+            let total = 0;
+
+            for (let i = 0; i < dataArray.length; i++) {
+                total += dataArray[i];
+                if (dataArray[i] > maxValue) {
+                    maxValue = dataArray[i];
+                    maxIndex = i;
+                }
+            }
+
+            const nyquist = audioContext.sampleRate / 2;
+            const dominantFreq = maxIndex * (nyquist / bufferLength);
+            const loudness = total / dataArray.length;
+
+            return { dominantFreq, loudness };
+        }
+    </script>
+</body>
+</html>
