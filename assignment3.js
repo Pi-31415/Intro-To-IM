@@ -1,3 +1,9 @@
+//  __        __    _ _             
+//  \ \      / /_ _| | | _____ _ __ 
+//   \ \ /\ / / _` | | |/ / _ \ '__|
+//    \ V  V / (_| | |   <  __/ |   
+//     \_/\_/ \__,_|_|_|\_\___|_|   
+// Pi Ko (pk2269@nyu.edu)                                 
 
 //Spider is walking and draggable
 class SpiderBody {
@@ -527,7 +533,7 @@ function draw() {
   textSize(30);
   textFont(customFont);
   fill(0);
-  text("The Practicality Walker", windowWidth / 2, 50);
+  text("Pi's\nPracticality Walker", windowWidth / 2, 50);
   textSize(16);
   fill(255);
   text(
