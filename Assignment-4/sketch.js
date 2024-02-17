@@ -37,7 +37,7 @@ function setup() {
   textSize(16);
   textAlign(CENTER, CENTER);
   for (let i = 0; i < data.length; i++) {
-    text(i, padding + i * barWidth + barWidth / 2, height - padding + 20);
+    text(i+1, padding + i * barWidth + barWidth / 2, height - padding + 20);
   }
 
   // Adding labels (text) to the bars - vertical (Y-axis) values
